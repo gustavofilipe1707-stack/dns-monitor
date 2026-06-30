@@ -138,6 +138,28 @@
   </div>
 </div>
 
+<!-- Modal: Token (só aparece ao tentar editar) -->
+<div class="modal fade" id="modalToken" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fa-solid fa-key me-2"></i>Token GitHub necessário</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted" style="font-size:.85rem">Para adicionar ou remover sites, informe seu token do GitHub. Ele fica salvo <strong>só neste navegador</strong> — você não precisará digitar novamente.</p>
+        <label class="form-label fw-semibold">Personal Access Token (classic, escopo <code>repo</code>)</label>
+        <input type="password" id="input-token" class="form-control font-monospace" placeholder="ghp_..." />
+        <div id="erro-token" class="text-danger mt-1" style="display:none;font-size:.83rem"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-primary" onclick="confirmarToken()"><i class="fa-solid fa-check me-1"></i>Salvar e continuar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Confirmar remoção -->
 <div class="modal fade" id="modalRemover" tabindex="-1">
   <div class="modal-dialog modal-sm">
@@ -160,12 +182,38 @@ const GH_FILE   = "sites.json";
 const GH_BRANCH = "main";
 const CACHE_KEY = "dns_monitor_results";
 const TOKEN_KEY = "dns_monitor_gh_token";
-const GH_TOKEN_DEFAULT = atob("Z2hwX0ZLQVRDS3ppZnBQ" + "eExMSDFvdU9nZ3F1NnRE" + "dUp1azF3dzhjVw==");
-
 let sites = [], results = {}, siteParaRemover = null;
 
-const getToken  = () => GH_TOKEN_DEFAULT;
+const getToken  = () => localStorage.getItem("dns_gh_token") || "";
+const setToken  = (t) => localStorage.setItem("dns_gh_token", t);
 const ghHeaders = () => ({ Authorization: `Bearer ${getToken()}`, Accept: "application/vnd.github+json" });
+
+// ── Token modal ──────────────────────────────────────────
+let _tokenResolve = null;
+
+function pedirToken() {
+  return new Promise((resolve) => {
+    _tokenResolve = resolve;
+    document.getElementById("input-token").value = "";
+    document.getElementById("erro-token").style.display = "none";
+    new bootstrap.Modal(document.getElementById("modalToken")).show();
+  });
+}
+
+async function confirmarToken() {
+  const t = document.getElementById("input-token").value.trim();
+  const erroEl = document.getElementById("erro-token");
+  if (!t) { erroEl.textContent = "Informe o token."; erroEl.style.display = "block"; return; }
+  try {
+    const r = await fetch("https://api.github.com/user", {
+      headers: { Authorization: `Bearer ${t}`, Accept: "application/vnd.github+json" }
+    });
+    if (!r.ok) throw new Error("Token inválido ou sem permissão.");
+    setToken(t);
+    bootstrap.Modal.getInstance(document.getElementById("modalToken")).hide();
+    if (_tokenResolve) { _tokenResolve(t); _tokenResolve = null; }
+  } catch(e) { erroEl.textContent = e.message; erroEl.style.display = "block"; }
+}
 
 // Fetch com timeout para não travar
 async function fetchComTimeout(url, opts = {}, ms = 12000) {
@@ -202,12 +250,19 @@ async function carregarSites() {
 }
 
 async function gravarSites(novaLista, msg) {
-  // Obtém SHA atual e grava num único fluxo
+  // Garante que temos token antes de gravar
+  if (!getToken()) await pedirToken();
+
   const rSha = await fetchComTimeout(
     `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,
     { headers: ghHeaders() }
   );
-  if (!rSha.ok) throw new Error("Erro ao ler arquivo no GitHub");
+  if (!rSha.ok) {
+    // Token inválido — pede novo
+    localStorage.removeItem("dns_gh_token");
+    await pedirToken();
+    return gravarSites(novaLista, msg);
+  }
   const { sha } = await rSha.json();
 
   const r = await fetchComTimeout(
