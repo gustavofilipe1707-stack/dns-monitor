@@ -162,90 +162,55 @@ const CACHE_KEY = "dns_monitor_results";
 const TOKEN_KEY = "dns_monitor_gh_token";
 const GH_TOKEN_DEFAULT = atob("Z2hwX0ZLQVRDS3ppZnBQ" + "eExMSDFvdU9nZ3F1NnRE" + "dUp1azF3dzhjVw==");
 
-let sites = [], results = {}, sitesSha = null, siteParaRemover = null;
+let sites = [], results = {}, siteParaRemover = null;
 
-// ── Token ────────────────────────────────────────────────
-const getToken = () => localStorage.getItem(TOKEN_KEY) || GH_TOKEN_DEFAULT;
+const getToken  = () => GH_TOKEN_DEFAULT;
+const ghHeaders = () => ({ Authorization: `Bearer ${getToken()}`, Accept: "application/vnd.github+json" });
 
-function atualizarBadgeToken() {
-  const ok = !!getToken();
-  document.getElementById("token-badge").classList.toggle("ok", ok);
-  document.getElementById("token-label").textContent = ok ? "Token configurado" : "Configurar token";
-}
-
-function abrirToken() {
-  document.getElementById("input-token").value = getToken();
-  document.getElementById("erro-token").style.display = "none";
-  new bootstrap.Modal(document.getElementById("modalToken")).show();
-}
-
-async function salvarToken() {
-  const t = document.getElementById("input-token").value.trim();
-  const erroEl = document.getElementById("erro-token");
-  erroEl.style.display = "none";
-  if (!t) { erroEl.textContent = "Informe o token."; erroEl.style.display = "block"; return; }
+// Fetch com timeout para não travar
+async function fetchComTimeout(url, opts = {}, ms = 12000) {
+  const ctrl = new AbortController();
+  const tid  = setTimeout(() => ctrl.abort(), ms);
   try {
-    const r = await fetch("https://api.github.com/user", { headers: ghHeaders(t) });
-    if (!r.ok) throw new Error("Token inválido ou sem permissão.");
-    localStorage.setItem(TOKEN_KEY, t);
-    atualizarBadgeToken();
-    bootstrap.Modal.getInstance(document.getElementById("modalToken")).hide();
-    await carregarSites();
-  } catch(e) {
-    erroEl.textContent = e.message;
-    erroEl.style.display = "block";
+    return await fetch(url, { ...opts, signal: ctrl.signal });
+  } finally {
+    clearTimeout(tid);
   }
 }
-
-function limparToken() {
-  localStorage.removeItem(TOKEN_KEY);
-  atualizarBadgeToken();
-  bootstrap.Modal.getInstance(document.getElementById("modalToken")).hide();
-}
-
-const ghHeaders = (tok) => ({
-  Authorization: `Bearer ${tok || getToken()}`,
-  Accept: "application/vnd.github+json"
-});
 
 // ── GitHub storage ───────────────────────────────────────
 async function carregarSites() {
-  setSyncInfo("Carregando...");
+  // Mostra cache imediatamente enquanto busca dados frescos
+  results = JSON.parse(localStorage.getItem(CACHE_KEY) || "{}");
+  const cacheKeys = Object.keys(results);
+  if (cacheKeys.length) { sites = cacheKeys; renderTabela(); }
+
+  setSyncInfo("Sincronizando...");
   try {
-    // Leitura pública — sem token (repositório público)
-    const r = await fetch(
-      `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/${GH_FILE}?t=${Date.now()}`
+    const r = await fetchComTimeout(
+      `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/${GH_FILE}?t=${Date.now()}`,
+      {}, 8000
     );
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     sites = await r.json();
-    results = JSON.parse(localStorage.getItem(CACHE_KEY) || "{}");
     setSyncInfo("");
     renderTabela();
-    await verificarTodos();
+    verificarTodos(); // sem await — roda em background, não trava a UI
   } catch(e) {
-    setSyncInfo("⚠ " + e.message);
-    const cache = JSON.parse(localStorage.getItem(CACHE_KEY) || "{}");
-    if (Object.keys(cache).length) { sites = Object.keys(cache); results = cache; renderTabela(); }
+    setSyncInfo("⚠ Offline — exibindo dados em cache");
   }
 }
 
-async function obterSha() {
-  const tok = getToken();
-  const headers = tok ? ghHeaders() : { Accept: "application/vnd.github+json" };
-  const r = await fetch(
-    `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,
-    { headers }
-  );
-  if (!r.ok) throw new Error("Erro ao obter SHA do arquivo");
-  const data = await r.json();
-  return data.sha;
-}
-
 async function gravarSites(novaLista, msg) {
-  if (!getToken()) { abrirToken(); throw new Error("Token necessário para editar a lista."); }
-  // Obtém SHA atual antes de gravar
-  const sha = await obterSha();
-  const r = await fetch(
+  // Obtém SHA atual e grava num único fluxo
+  const rSha = await fetchComTimeout(
+    `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,
+    { headers: ghHeaders() }
+  );
+  if (!rSha.ok) throw new Error("Erro ao ler arquivo no GitHub");
+  const { sha } = await rSha.json();
+
+  const r = await fetchComTimeout(
     `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,
     {
       method: "PUT",
@@ -254,7 +219,6 @@ async function gravarSites(novaLista, msg) {
     }
   );
   if (!r.ok) throw new Error("Erro ao salvar no GitHub: " + r.status);
-  return true;
 }
 
 // ── Verificação SSL / DNS ────────────────────────────────
@@ -280,7 +244,9 @@ function rdapUrl(h) {
 
 async function fetchCrtSh(query) {
   try {
-    const r = await fetch(`https://crt.sh/?q=${encodeURIComponent(query)}&output=json`);
+    const r = await fetchComTimeout(
+      `https://crt.sh/?q=${encodeURIComponent(query)}&output=json`, {}, 12000
+    );
     if (!r.ok) return [];
     return await r.json();
   } catch { return []; }
@@ -307,7 +273,9 @@ async function checkSSL(h) {
 
 async function checkDomain(h) {
   try {
-    const r = await fetch(rdapUrl(h), { headers: { Accept: "application/rdap+json" } });
+    const r = await fetchComTimeout(
+      rdapUrl(h), { headers: { Accept: "application/rdap+json" } }, 10000
+    );
     if (!r.ok) throw new Error(`RDAP ${r.status}`);
     const data = await r.json();
     const ev = (data.events||[]).find(e=>e.eventAction==="expiration");
@@ -448,8 +416,7 @@ async function confirmarRemocao() {
 }
 
 // ── Init ─────────────────────────────────────────────────
-atualizarBadgeToken();
-carregarSites(); // carrega sempre, sem precisar de token
+carregarSites();
 </script>
 </body>
 </html>
