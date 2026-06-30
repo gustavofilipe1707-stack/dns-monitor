@@ -1,0 +1,30 @@
+name: Verificar DNS & SSL
+
+on:
+  schedule:
+    - cron: '0 11 * * *'   # 08h horário de Brasília (UTC-3)
+  workflow_dispatch:         # permite disparar manualmente pelo dashboard ou pela UI do GitHub
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: scripts/package.json
+
+      - name: Instalar dependências
+        run: npm install
+        working-directory: scripts
+
+      - name: Verificar domínios
+        run: node check.js
+        working-directory: scripts
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
