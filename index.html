@@ -71,9 +71,6 @@
   </div>
   <div class="ms-auto d-flex align-items-center gap-2 flex-wrap">
     <span id="sync-info" style="font-size:.75rem; color:#aaa"></span>
-    <span class="token-badge" id="token-badge" onclick="abrirToken()">
-      <i class="fa-solid fa-key me-1"></i><span id="token-label">Configurar token</span>
-    </span>
     <button class="btn btn-sm btn-outline-light" onclick="reverificarTodos()" id="btn-rev">
       <i class="fa-solid fa-arrows-rotate me-1"></i>Reverificar
     </button>
@@ -141,36 +138,6 @@
   </div>
 </div>
 
-<!-- Modal: Token GitHub -->
-<div class="modal fade" id="modalToken" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title"><i class="fa-solid fa-key me-2"></i>Token GitHub</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <p class="text-muted" style="font-size:.85rem">
-          O token salva a lista de sites no GitHub para que ela apareça automaticamente em qualquer acesso.
-          Fica guardado só neste navegador.<br><br>
-          Crie em: <strong>GitHub → Settings → Developer settings → Personal access tokens (classic)</strong><br>
-          Escopo necessário: <code>repo</code>
-        </p>
-        <label class="form-label fw-semibold">Personal Access Token</label>
-        <input type="password" id="input-token" class="form-control font-monospace" placeholder="ghp_..." />
-        <div id="erro-token" class="text-danger mt-1" style="display:none; font-size:.83rem"></div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-sm btn-outline-danger me-auto" onclick="limparToken()">Remover token</button>
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button class="btn btn-primary" onclick="salvarToken()">
-          <i class="fa-solid fa-check me-1"></i>Salvar e carregar
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- Modal: Confirmar remoção -->
 <div class="modal fade" id="modalRemover" tabindex="-1">
   <div class="modal-dialog modal-sm">
@@ -193,11 +160,12 @@ const GH_FILE   = "sites.json";
 const GH_BRANCH = "main";
 const CACHE_KEY = "dns_monitor_results";
 const TOKEN_KEY = "dns_monitor_gh_token";
+const GH_TOKEN_DEFAULT = "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";
 
 let sites = [], results = {}, sitesSha = null, siteParaRemover = null;
 
 // ── Token ────────────────────────────────────────────────
-const getToken = () => localStorage.getItem(TOKEN_KEY) || "";
+const getToken = () => localStorage.getItem(TOKEN_KEY) || GH_TOKEN_DEFAULT;
 
 function atualizarBadgeToken() {
   const ok = !!getToken();
