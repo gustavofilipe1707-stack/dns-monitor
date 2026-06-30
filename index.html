@@ -7,147 +7,117 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    :root {
-      --ok:       #198754;
-      --warning:  #fd7e14;
-      --critical: #dc3545;
-      --error:    #6c757d;
-    }
-    body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
+    :root { --ok:#198754; --warn:#fd7e14; --crit:#dc3545; --err:#6c757d; }
+    body { background:#f0f2f5; font-family:'Segoe UI',sans-serif; }
 
-    /* Topbar */
-    .topbar {
-      background: #1a1a2e; color: #fff;
-      padding: 16px 24px; display: flex; align-items: center; gap: 14px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.3);
-    }
-    .topbar h1 { font-size: 1.25rem; font-weight: 600; margin: 0; }
-    .topbar p  { font-size: .78rem; color: #aaa; margin: 0; }
+    .topbar { background:#1a1a2e; color:#fff; padding:16px 24px; display:flex; align-items:center; gap:14px; box-shadow:0 2px 8px rgba(0,0,0,.3); flex-wrap:wrap; }
+    .topbar h1 { font-size:1.25rem; font-weight:600; margin:0; }
+    .topbar p  { font-size:.78rem; color:#aaa; margin:0; }
 
-    /* Input */
-    .input-card { border-radius: 14px; border: none; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
-    #input-url { border-right: none; font-size: .95rem; }
-    #input-url:focus { box-shadow: none; border-color: #ced4da; }
-    .btn-check-now { background: #1a1a2e; color: #fff; border: none; border-radius: 0 8px 8px 0; padding: 0 20px; }
-    .btn-check-now:hover { background: #16213e; color: #fff; }
+    .input-card { border-radius:14px; border:none; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+    #input-url  { border-right:none; font-size:.95rem; }
+    #input-url:focus { box-shadow:none; border-color:#ced4da; }
+    .btn-add { background:#1a1a2e; color:#fff; border:none; white-space:nowrap; }
+    .btn-add:hover { background:#16213e; color:#fff; }
 
-    /* Cards */
-    .stat-card { border-radius: 12px; border: none; box-shadow: 0 2px 8px rgba(0,0,0,.07); }
-    .stat-card .num { font-size: 1.9rem; font-weight: 700; }
-    .stat-card.c-total { border-left: 5px solid #0d6efd; }
-    .stat-card.c-ok    { border-left: 5px solid var(--ok); }
-    .stat-card.c-warn  { border-left: 5px solid var(--warning); }
-    .stat-card.c-crit  { border-left: 5px solid var(--critical); }
+    .stat-card { border-radius:12px; border:none; box-shadow:0 2px 8px rgba(0,0,0,.07); }
+    .stat-card .num { font-size:1.9rem; font-weight:700; }
+    .c-total { border-left:5px solid #0d6efd; }
+    .c-ok    { border-left:5px solid var(--ok); }
+    .c-warn  { border-left:5px solid var(--warn); }
+    .c-crit  { border-left:5px solid var(--crit); }
 
-    /* Tabela */
-    .tabela-wrap { border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
-    table { margin: 0; }
-    thead th { background: #1a1a2e; color: #fff; font-size: .85rem; font-weight: 500; border: none; padding: 12px 14px; }
-    tbody td { vertical-align: middle; padding: 11px 14px; border-color: #eee; }
-    tbody tr:hover { background: #f8f9ff; }
+    .tabela-wrap { border-radius:12px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.08); }
+    table { margin:0; }
+    thead th { background:#1a1a2e; color:#fff; font-size:.85rem; font-weight:500; border:none; padding:12px 14px; }
+    tbody td { vertical-align:middle; padding:11px 14px; border-color:#eee; font-size:.9rem; }
+    tbody tr:hover { background:#f8f9ff; }
 
-    /* Badges / dias */
-    .d-ok       { color: var(--ok);       font-weight: 600; }
-    .d-warning  { color: var(--warning);  font-weight: 600; }
-    .d-critical { color: var(--critical); font-weight: 700; }
-    .d-error    { color: var(--error); }
-    .d-loading  { color: #aaa; }
+    .d-ok       { color:var(--ok);   font-weight:600; }
+    .d-warning  { color:var(--warn); font-weight:600; }
+    .d-critical { color:var(--crit); font-weight:700; }
+    .d-error    { color:var(--err); }
+    .d-loading  { color:#aaa; font-size:.85rem; }
 
-    .badge-ok       { background: var(--ok);       color:#fff; }
-    .badge-warning  { background: var(--warning);  color:#fff; }
-    .badge-critical { background: var(--critical); color:#fff; }
-    .badge-error    { background: var(--error);    color:#fff; }
-    .badge-loading  { background: #dee2e6;         color:#666; }
+    .badge-ok       { background:var(--ok);   color:#fff; }
+    .badge-warning  { background:var(--warn);  color:#fff; }
+    .badge-critical { background:var(--crit);  color:#fff; }
+    .badge-error    { background:var(--err);   color:#fff; }
+    .badge-loading  { background:#dee2e6;      color:#555; }
 
-    .domain-name { font-weight: 600; }
-    .domain-sub  { font-size: .78rem; color: #888; }
+    .domain-name { font-weight:600; }
+    .domain-sub  { font-size:.75rem; color:#999; }
 
-    #vazio { text-align: center; padding: 60px 0; color: #bbb; }
-    #vazio i { font-size: 3rem; display: block; margin-bottom: 12px; }
+    #vazio { text-align:center; padding:60px 0; color:#bbb; }
+    #vazio i { font-size:3rem; display:block; margin-bottom:12px; }
 
-    .spinner-border-sm { width: .9rem; height: .9rem; border-width: 2px; }
-    .btn-reload { padding: 2px 8px; font-size: .8rem; }
-    .btn-del    { padding: 2px 7px; font-size: .8rem; }
+    .spinner-border-sm { width:.9rem; height:.9rem; border-width:2px; }
+
+    .modal-header { background:#1a1a2e; color:#fff; }
+    .modal-header .btn-close { filter:invert(1); }
+
+    .token-badge { font-size:.75rem; padding:3px 10px; border-radius:20px; cursor:pointer; border:1px solid rgba(255,255,255,.3); background:rgba(255,255,255,.1); color:#fff; transition:background .15s; }
+    .token-badge:hover { background:rgba(255,255,255,.2); }
+    .token-badge.ok { background:rgba(40,167,69,.3); border-color:#28a745; }
   </style>
 </head>
 <body>
 
-<!-- Topbar -->
 <div class="topbar">
   <i class="fa-solid fa-shield-halved fa-xl" style="color:#7b9cff"></i>
   <div>
     <h1>Monitor DNS &amp; SSL</h1>
     <p>Vencimento de certificados e registros de domínio</p>
   </div>
+  <div class="ms-auto d-flex align-items-center gap-2 flex-wrap">
+    <span id="sync-info" style="font-size:.75rem; color:#aaa"></span>
+    <span class="token-badge" id="token-badge" onclick="abrirToken()">
+      <i class="fa-solid fa-key me-1"></i><span id="token-label">Configurar token</span>
+    </span>
+    <button class="btn btn-sm btn-outline-light" onclick="reverificarTodos()" id="btn-rev">
+      <i class="fa-solid fa-arrows-rotate me-1"></i>Reverificar
+    </button>
+  </div>
 </div>
 
 <div class="container-fluid px-4 py-4" style="max-width:1200px">
 
-  <!-- Input -->
   <div class="card input-card mb-4 p-3">
-    <div class="fw-semibold mb-2" style="font-size:.9rem">
-      <i class="fa-solid fa-plus-circle me-1 text-primary"></i>Adicionar site para monitorar
+    <div class="fw-semibold mb-2" style="font-size:.88rem; color:#555">
+      <i class="fa-solid fa-plus-circle me-1 text-primary"></i>Adicionar site ao monitoramento
     </div>
     <div class="input-group">
       <input id="input-url" type="text" class="form-control"
-             placeholder="Ex: google.com  /  app.minhaempresa.com.br  /  https://empresa.com"
-             onkeydown="if(event.key==='Enter') adicionar()" />
-      <button class="btn btn-check-now" onclick="adicionar()">
-        <i class="fa-solid fa-magnifying-glass me-1"></i> Consultar
+             placeholder="Ex: google.com  /  app.empresa.com.br  /  https://site.com"
+             onkeydown="if(event.key==='Enter') adicionarSite()" />
+      <button class="btn btn-add px-4" onclick="adicionarSite()">
+        <i class="fa-solid fa-plus me-1"></i>Adicionar
       </button>
     </div>
-    <div id="erro-input" class="text-danger mt-1" style="display:none;font-size:.83rem"></div>
+    <div id="erro-input" class="text-danger mt-1" style="display:none; font-size:.83rem"></div>
   </div>
 
-  <!-- Resumo -->
-  <div class="row g-3 mb-4" id="cards-resumo" style="display:none!important">
-    <div class="col-6 col-md-3">
-      <div class="card stat-card c-total p-3">
-        <div class="text-muted" style="font-size:.75rem">TOTAL</div>
-        <div class="num text-primary" id="s-total">0</div>
-        <div style="font-size:.78rem">monitorados</div>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card stat-card c-ok p-3">
-        <div class="text-muted" style="font-size:.75rem">OK</div>
-        <div class="num" style="color:var(--ok)" id="s-ok">0</div>
-        <div style="font-size:.78rem">&gt; 30 dias</div>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card stat-card c-warn p-3">
-        <div class="text-muted" style="font-size:.75rem">ATENÇÃO</div>
-        <div class="num" style="color:var(--warning)" id="s-warn">0</div>
-        <div style="font-size:.78rem">7 – 30 dias</div>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card stat-card c-crit p-3">
-        <div class="text-muted" style="font-size:.75rem">CRÍTICO</div>
-        <div class="num" style="color:var(--critical)" id="s-crit">0</div>
-        <div style="font-size:.78rem">&lt; 7 dias</div>
-      </div>
-    </div>
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3"><div class="card stat-card c-total p-3"><div class="text-muted" style="font-size:.75rem">TOTAL</div><div class="num text-primary" id="s-total">–</div><div style="font-size:.78rem">monitorados</div></div></div>
+    <div class="col-6 col-md-3"><div class="card stat-card c-ok p-3"><div class="text-muted" style="font-size:.75rem">OK</div><div class="num" style="color:var(--ok)" id="s-ok">–</div><div style="font-size:.78rem">&gt; 30 dias</div></div></div>
+    <div class="col-6 col-md-3"><div class="card stat-card c-warn p-3"><div class="text-muted" style="font-size:.75rem">ATENÇÃO</div><div class="num" style="color:var(--warn)" id="s-warn">–</div><div style="font-size:.78rem">7 – 30 dias</div></div></div>
+    <div class="col-6 col-md-3"><div class="card stat-card c-crit p-3"><div class="text-muted" style="font-size:.75rem">CRÍTICO</div><div class="num" style="color:var(--crit)" id="s-crit">–</div><div style="font-size:.78rem">&lt; 7 dias</div></div></div>
   </div>
 
-  <!-- Tabela -->
-  <div id="wrap-tabela" class="tabela-wrap bg-white" style="display:none">
+  <div class="tabela-wrap bg-white" id="wrap-tabela" style="display:none">
     <div class="d-flex align-items-center justify-content-between px-3 py-2" style="border-bottom:1px solid #eee">
-      <span style="font-size:.85rem;color:#555"><i class="fa-solid fa-list me-1"></i>Sites monitorados</span>
-      <button class="btn btn-sm btn-outline-secondary" onclick="reverificarTodos()" id="btn-rev">
-        <i class="fa-solid fa-arrows-rotate me-1"></i>Reverificar todos
-      </button>
+      <span style="font-size:.83rem; color:#666"><i class="fa-solid fa-list me-1"></i>Sites monitorados</span>
+      <span id="ultima-check" style="font-size:.75rem; color:#aaa"></span>
     </div>
     <div style="overflow-x:auto">
       <table class="table table-hover">
         <thead>
           <tr>
             <th>Site</th>
-            <th class="text-center">Certificado SSL</th>
-            <th class="text-center">Registro do Domínio</th>
-            <th class="text-center">Status geral</th>
-            <th class="text-center">Verificado em</th>
+            <th class="text-center" style="min-width:130px">Certificado SSL</th>
+            <th class="text-center" style="min-width:150px">Registro do Domínio</th>
+            <th class="text-center">Status</th>
+            <th class="text-center" style="min-width:140px">Verificado em</th>
             <th class="text-center"></th>
           </tr>
         </thead>
@@ -158,280 +128,343 @@
 
   <div id="vazio">
     <i class="fa-solid fa-globe"></i>
-    Nenhum site adicionado ainda.<br>
-    <span style="font-size:.85rem">Digite um domínio acima e clique em <strong>Consultar</strong>.</span>
+    Nenhum site cadastrado.<br>
+    <span style="font-size:.85rem">Configure o token GitHub e adicione um domínio acima.</span>
   </div>
 
-  <div class="mt-3 text-muted" style="font-size:.75rem" id="legenda" style="display:none">
+  <div class="mt-3 text-muted" id="legenda" style="display:none; font-size:.75rem">
     <i class="fa-solid fa-circle-info me-1"></i>
-    SSL verificado via <strong>Certificate Transparency (crt.sh)</strong> ·
-    Domínio via <strong>RDAP</strong> ·
-    Dados salvos no navegador (localStorage).
-    <span class="ms-2 text-success">●</span> &gt;30d
-    <span class="ms-1 text-warning">●</span> 7–30d
-    <span class="ms-1 text-danger">●</span> &lt;7d
+    SSL via <strong>crt.sh</strong> · Domínio via <strong>RDAP</strong> · Lista salva no <strong>GitHub</strong> — abre em qualquer navegador com a mesma lista.
+    <span class="ms-2" style="color:var(--ok)">●</span> &gt;30d
+    <span style="color:var(--warn)">●</span> 7–30d
+    <span style="color:var(--crit)">●</span> &lt;7d
+  </div>
+</div>
+
+<!-- Modal: Token GitHub -->
+<div class="modal fade" id="modalToken" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fa-solid fa-key me-2"></i>Token GitHub</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted" style="font-size:.85rem">
+          O token salva a lista de sites no GitHub para que ela apareça automaticamente em qualquer acesso.
+          Fica guardado só neste navegador.<br><br>
+          Crie em: <strong>GitHub → Settings → Developer settings → Personal access tokens (classic)</strong><br>
+          Escopo necessário: <code>repo</code>
+        </p>
+        <label class="form-label fw-semibold">Personal Access Token</label>
+        <input type="password" id="input-token" class="form-control font-monospace" placeholder="ghp_..." />
+        <div id="erro-token" class="text-danger mt-1" style="display:none; font-size:.83rem"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-sm btn-outline-danger me-auto" onclick="limparToken()">Remover token</button>
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarToken()">
+          <i class="fa-solid fa-check me-1"></i>Salvar e carregar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Confirmar remoção -->
+<div class="modal fade" id="modalRemover" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title text-danger"><i class="fa-solid fa-trash me-2"></i>Remover</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">Remover <strong id="nome-remover"></strong> do monitoramento?</div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmarRemocao()">Remover</button>
+      </div>
+    </div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// ─────────────────────────────────────────────────────────
-//  Estado
-// ─────────────────────────────────────────────────────────
-let sites = JSON.parse(localStorage.getItem('dns_monitor_sites') || '[]');
+const GH_OWNER  = "gustavofilipe1707-stack";
+const GH_REPO   = "dns-monitor";
+const GH_FILE   = "sites.json";
+const GH_BRANCH = "main";
+const CACHE_KEY = "dns_monitor_results";
+const TOKEN_KEY = "dns_monitor_gh_token";
 
-// ─────────────────────────────────────────────────────────
-//  Utilitários de domínio
-// ─────────────────────────────────────────────────────────
-function extrairHostname(input) {
-  input = input.trim().toLowerCase();
-  if (!/^https?:\/\//i.test(input)) input = 'https://' + input;
-  try { return new URL(input).hostname.replace(/^www\./, ''); }
-  catch { return null; }
+let sites = [], results = {}, sitesSha = null, siteParaRemover = null;
+
+// ── Token ────────────────────────────────────────────────
+const getToken = () => localStorage.getItem(TOKEN_KEY) || "";
+
+function atualizarBadgeToken() {
+  const ok = !!getToken();
+  document.getElementById("token-badge").classList.toggle("ok", ok);
+  document.getElementById("token-label").textContent = ok ? "Token configurado" : "Configurar token";
 }
 
-const BR_SLD = new Set(['com','net','org','edu','gov','mil','leg','b','nom','etc','tur','srv','tmp','adv','arq','ato','bio','bmd','cim','cng','cnt','coop','ecn','eco','emp','eng','esp','etc','eti','far','fnd','fot','fst','ggf','imb','ind','inf','jor','jus','lel','mat','med','mus','not','ntr','odo','ppg','pro','psc','pub','qsl','radio','rec','slg','srv','taxi','teo','tmp','trd','tur','tv','vet','zlg']);
-
-function dominioRegistravel(hostname) {
-  const parts = hostname.split('.');
-  const tld = parts[parts.length - 1];
-  if (tld === 'br' && parts.length >= 3 && BR_SLD.has(parts[parts.length - 2])) {
-    return parts.slice(-3).join('.');
-  }
-  return parts.slice(-2).join('.');
+function abrirToken() {
+  document.getElementById("input-token").value = getToken();
+  document.getElementById("erro-token").style.display = "none";
+  new bootstrap.Modal(document.getElementById("modalToken")).show();
 }
 
-function getRdapUrl(hostname) {
-  const reg = dominioRegistravel(hostname);
-  const tld = reg.split('.').pop();
-  if (tld === 'br')  return `https://rdap.registro.br/domain/${reg}`;
-  if (tld === 'com') return `https://rdap.verisign.com/com/v1/domain/${reg}`;
-  if (tld === 'net') return `https://rdap.verisign.com/net/v1/domain/${reg}`;
-  if (tld === 'org') return `https://rdap.publicinterestregistry.org/rdap/domain/${reg}`;
-  if (tld === 'io')  return `https://rdap.nic.io/domain/${reg}`;
-  return `https://rdap.org/domain/${reg}`;
-}
-
-// ─────────────────────────────────────────────────────────
-//  Consultas (Browser → APIs públicas, sem backend)
-// ─────────────────────────────────────────────────────────
-async function checkSSL(hostname) {
+async function salvarToken() {
+  const t = document.getElementById("input-token").value.trim();
+  const erroEl = document.getElementById("erro-token");
+  erroEl.style.display = "none";
+  if (!t) { erroEl.textContent = "Informe o token."; erroEl.style.display = "block"; return; }
   try {
-    // crt.sh = Certificate Transparency log (suporta CORS)
-    const res = await fetch(
-      `https://crt.sh/?q=${encodeURIComponent(hostname)}&output=json`,
-      { headers: { Accept: 'application/json' } }
-    );
-    if (!res.ok) throw new Error(`crt.sh HTTP ${res.status}`);
-    const certs = await res.json();
-    const now = Date.now();
+    const r = await fetch("https://api.github.com/user", { headers: ghHeaders(t) });
+    if (!r.ok) throw new Error("Token inválido ou sem permissão.");
+    localStorage.setItem(TOKEN_KEY, t);
+    atualizarBadgeToken();
+    bootstrap.Modal.getInstance(document.getElementById("modalToken")).hide();
+    await carregarSites();
+  } catch(e) {
+    erroEl.textContent = e.message;
+    erroEl.style.display = "block";
+  }
+}
 
-    // Filtra certs válidos para este hostname (inclui wildcard)
+function limparToken() {
+  localStorage.removeItem(TOKEN_KEY);
+  atualizarBadgeToken();
+  bootstrap.Modal.getInstance(document.getElementById("modalToken")).hide();
+}
+
+const ghHeaders = (tok) => ({
+  Authorization: `Bearer ${tok || getToken()}`,
+  Accept: "application/vnd.github+json"
+});
+
+// ── GitHub storage ───────────────────────────────────────
+async function carregarSites() {
+  setSyncInfo("Carregando lista do GitHub...");
+  try {
+    const r = await fetch(
+      `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,
+      { headers: ghHeaders() }
+    );
+    if (!r.ok) throw new Error(`GitHub ${r.status}`);
+    const data = await r.json();
+    sitesSha = data.sha;
+    sites = JSON.parse(atob(data.content.replace(/\n/g, "")));
+    results = JSON.parse(localStorage.getItem(CACHE_KEY) || "{}");
+    setSyncInfo("");
+    renderTabela();
+    await verificarTodos();
+  } catch(e) {
+    setSyncInfo("⚠ " + e.message);
+    const cache = JSON.parse(localStorage.getItem(CACHE_KEY) || "{}");
+    if (Object.keys(cache).length) { sites = Object.keys(cache); results = cache; renderTabela(); }
+  }
+}
+
+async function gravarSites(novaLista, msg) {
+  if (!getToken()) { abrirToken(); return false; }
+  const r = await fetch(
+    `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,
+    {
+      method: "PUT",
+      headers: { ...ghHeaders(), "Content-Type": "application/json" },
+      body: JSON.stringify({ message: msg, content: btoa(JSON.stringify(novaLista)), sha: sitesSha, branch: GH_BRANCH })
+    }
+  );
+  if (!r.ok) throw new Error("Erro ao salvar no GitHub: " + r.status);
+  const data = await r.json();
+  sitesSha = data.content.sha;
+  return true;
+}
+
+// ── Verificação SSL / DNS ────────────────────────────────
+const BR_SLD = new Set(["com","net","org","edu","gov","mil","leg","b","nom","etc","tur"]);
+
+function extrairHostname(v) {
+  v = v.trim().toLowerCase();
+  if (!/^https?:\/\//i.test(v)) v = "https://" + v;
+  try { return new URL(v).hostname.replace(/^www\./, ""); } catch { return null; }
+}
+
+function dominioReg(h) {
+  const p = h.split(".");
+  if (p[p.length-1] === "br" && p.length >= 3 && BR_SLD.has(p[p.length-2])) return p.slice(-3).join(".");
+  return p.slice(-2).join(".");
+}
+
+function rdapUrl(h) {
+  const r = dominioReg(h), tld = r.split(".").pop();
+  const m = { br:"https://rdap.registro.br/domain/", com:"https://rdap.verisign.com/com/v1/domain/", net:"https://rdap.verisign.com/net/v1/domain/", org:"https://rdap.publicinterestregistry.org/rdap/domain/" };
+  return (m[tld] || "https://rdap.org/domain/") + r;
+}
+
+async function checkSSL(h) {
+  try {
+    const r = await fetch(`https://crt.sh/?q=${encodeURIComponent(h)}&output=json`);
+    if (!r.ok) throw new Error("crt.sh indisponível");
+    const certs = await r.json();
+    const now = Date.now();
     const ativos = certs
       .filter(c => {
-        const expiry = new Date(c.not_after + 'Z').getTime();
-        if (expiry <= now) return false;
-        const names = (c.name_value || '').split('\n').map(n => n.trim().toLowerCase());
-        const wildcard = '*.' + hostname.split('.').slice(1).join('.');
-        return names.some(n => n === hostname || n === wildcard || n === '*.' + hostname);
+        if (new Date(c.not_after + "Z").getTime() <= now) return false;
+        const ns = (c.name_value||"").split("\n").map(n=>n.trim().toLowerCase());
+        const wc = "*." + h.split(".").slice(1).join(".");
+        return ns.some(n => n===h || n===wc);
       })
-      .sort((a, b) => new Date(b.not_after) - new Date(a.not_after));
-
-    if (ativos.length === 0) {
-      // tenta sem filtro de hostname (pega qualquer cert ativo emitido para o domínio)
-      const qualquer = certs
-        .filter(c => new Date(c.not_after + 'Z').getTime() > now)
-        .sort((a, b) => new Date(b.not_after) - new Date(a.not_after));
-      if (qualquer.length === 0) return { error: 'Nenhum certificado ativo encontrado' };
-      const expiry = new Date(qualquer[0].not_after + 'Z');
-      return { expiry: expiry.toISOString(), daysLeft: Math.ceil((expiry - now) / 86400000), issuer: qualquer[0].issuer_name };
-    }
-
-    const expiry = new Date(ativos[0].not_after + 'Z');
-    return { expiry: expiry.toISOString(), daysLeft: Math.ceil((expiry - now) / 86400000), issuer: ativos[0].issuer_name };
-  } catch (err) {
-    return { error: err.message };
-  }
+      .sort((a,b) => new Date(b.not_after) - new Date(a.not_after));
+    const cert = ativos[0] || certs.filter(c=>new Date(c.not_after+"Z").getTime()>now).sort((a,b)=>new Date(b.not_after)-new Date(a.not_after))[0];
+    if (!cert) return { error: "Nenhum certificado ativo" };
+    const exp = new Date(cert.not_after + "Z");
+    return { expiry: exp.toISOString(), daysLeft: Math.ceil((exp-now)/86400000), issuer: cert.issuer_name };
+  } catch(e) { return { error: e.message }; }
 }
 
-async function checkDomainExpiry(hostname) {
+async function checkDomain(h) {
   try {
-    const url = getRdapUrl(hostname);
-    const res = await fetch(url, { headers: { Accept: 'application/rdap+json, application/json' } });
-    if (!res.ok) throw new Error(`RDAP HTTP ${res.status}`);
-    const data = await res.json();
-    const expEvent = (data.events || []).find(e => e.eventAction === 'expiration');
-    if (!expEvent) return { error: 'Data de expiração não encontrada' };
-    const expiry = new Date(expEvent.eventDate);
-    return { expiry: expiry.toISOString(), daysLeft: Math.ceil((expiry - Date.now()) / 86400000), domain: dominioRegistravel(hostname) };
-  } catch (err) {
-    return { error: err.message };
-  }
+    const r = await fetch(rdapUrl(h), { headers: { Accept: "application/rdap+json" } });
+    if (!r.ok) throw new Error(`RDAP ${r.status}`);
+    const data = await r.json();
+    const ev = (data.events||[]).find(e=>e.eventAction==="expiration");
+    if (!ev) return { error: "Expiração não encontrada" };
+    const exp = new Date(ev.eventDate);
+    return { expiry: exp.toISOString(), daysLeft: Math.ceil((exp-Date.now())/86400000) };
+  } catch(e) { return { error: e.message }; }
 }
 
-function calcStatus(ssl, domain) {
-  if (ssl?.error && domain?.error) return 'error';
-  const dias = Math.min(ssl?.daysLeft ?? 9999, domain?.daysLeft ?? 9999);
-  if (dias <= 7)  return 'critical';
-  if (dias <= 30) return 'warning';
-  return 'ok';
+function calcStatus(r) {
+  if (!r || r.loading) return "loading";
+  if (r.ssl?.error && r.domain?.error) return "error";
+  const d = Math.min(r.ssl?.daysLeft??9999, r.domain?.daysLeft??9999);
+  return d<=7 ? "critical" : d<=30 ? "warning" : "ok";
 }
 
-// ─────────────────────────────────────────────────────────
-//  Renderização
-// ─────────────────────────────────────────────────────────
-function diasHtml(obj, loading) {
-  if (loading) return `<span class="d-loading"><span class="spinner-border spinner-border-sm me-1"></span>...</span>`;
-  if (!obj)          return `<span class="d-error">–</span>`;
-  if (obj.error)     return `<span class="d-error" title="${obj.error}"><i class="fa-solid fa-circle-xmark me-1"></i>Erro</span>`;
-  const d = obj.daysLeft;
-  const cls  = d <= 7 ? 'd-critical' : d <= 30 ? 'd-warning' : 'd-ok';
-  const icon = d <= 7 ? 'fa-triangle-exclamation' : d <= 30 ? 'fa-clock' : 'fa-circle-check';
-  return `<span class="${cls}"><i class="fa-solid ${icon} me-1"></i>${d} dia${d !== 1 ? 's' : ''}</span>`;
+async function verificarSite(h) {
+  results[h] = { ...(results[h]||{}), loading: true };
+  renderLinha(h);
+  const [ssl, domain] = await Promise.all([checkSSL(h), checkDomain(h)]);
+  results[h] = { ssl, domain, checkedAt: new Date().toISOString() };
+  localStorage.setItem(CACHE_KEY, JSON.stringify(results));
+  renderLinha(h);
+  atualizarCards();
 }
 
-function statusBadge(status, loading) {
-  if (loading) return `<span class="badge badge-loading px-2"><span class="spinner-border spinner-border-sm me-1"></span>verificando</span>`;
-  const m = {
-    ok:       ['badge-ok',       'fa-circle-check',         'OK'],
-    warning:  ['badge-warning',  'fa-clock',                'Atenção'],
-    critical: ['badge-critical', 'fa-triangle-exclamation', 'Crítico'],
-    error:    ['badge-error',    'fa-circle-xmark',         'Erro'],
-  };
-  const [cls, icon, label] = m[status] || m.error;
-  return `<span class="badge ${cls} px-2 py-1"><i class="fa-solid ${icon} me-1"></i>${label}</span>`;
-}
-
-function renderTudo() {
-  const tbody = document.getElementById('tbody');
-  const vazio = document.getElementById('vazio');
-  const wrap  = document.getElementById('wrap-tabela');
-  const cards = document.getElementById('cards-resumo');
-  const leg   = document.getElementById('legenda');
-
-  if (sites.length === 0) {
-    vazio.style.display = 'block';
-    wrap.style.display  = 'none';
-    cards.style.removeProperty('display');
-    cards.style.display = 'none';
-    leg.style.display   = 'none';
-    return;
-  }
-
-  vazio.style.display = 'none';
-  wrap.style.display  = 'block';
-  cards.style.removeProperty('display');
-  leg.style.display   = 'block';
-
-  let ok = 0, warn = 0, crit = 0;
-  tbody.innerHTML = '';
-
-  sites.forEach((s, idx) => {
-    const loading = !!s.loading;
-    const status  = loading ? null : calcStatus(s.ssl, s.domain);
-    if (!loading) {
-      if (status === 'ok') ok++;
-      else if (status === 'warning') warn++;
-      else if (status === 'critical') crit++;
-    }
-
-    const data = s.checkedAt
-      ? new Date(s.checkedAt).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })
-      : '–';
-
-    const tr = document.createElement('tr');
-    tr.id = `row-${idx}`;
-    tr.innerHTML = `
-      <td>
-        <div class="domain-name"><i class="fa-solid fa-globe me-2 text-muted"></i>${s.hostname}</div>
-        <div class="domain-sub"><a href="https://${s.hostname}" target="_blank" class="text-decoration-none text-muted">https://${s.hostname} <i class="fa-solid fa-arrow-up-right-from-square fa-xs"></i></a></div>
-      </td>
-      <td class="text-center">${diasHtml(s.ssl, loading)}</td>
-      <td class="text-center">${diasHtml(s.domain, loading)}</td>
-      <td class="text-center">${statusBadge(status, loading)}</td>
-      <td class="text-center" style="font-size:.78rem;color:#999">${data}</td>
-      <td class="text-center">
-        <button class="btn btn-sm btn-outline-secondary btn-reload me-1" title="Reverificar" onclick="reverificar(${idx})" ${loading ? 'disabled' : ''}>
-          <i class="fa-solid fa-arrows-rotate"></i>
-        </button>
-        <button class="btn btn-sm btn-outline-danger btn-del" title="Remover" onclick="remover(${idx})" ${loading ? 'disabled' : ''}>
-          <i class="fa-solid fa-trash-can"></i>
-        </button>
-      </td>`;
-    tbody.appendChild(tr);
-  });
-
-  document.getElementById('s-total').textContent = sites.length;
-  document.getElementById('s-ok').textContent    = ok;
-  document.getElementById('s-warn').textContent  = warn;
-  document.getElementById('s-crit').textContent  = crit;
-}
-
-function salvar() { localStorage.setItem('dns_monitor_sites', JSON.stringify(sites)); }
-
-// ─────────────────────────────────────────────────────────
-//  Ações
-// ─────────────────────────────────────────────────────────
-async function verificarSite(idx) {
-  sites[idx].loading  = true;
-  sites[idx].ssl      = null;
-  sites[idx].domain   = null;
-  renderTudo();
-
-  const hostname = sites[idx].hostname;
-  const [ssl, domain] = await Promise.all([checkSSL(hostname), checkDomainExpiry(hostname)]);
-
-  sites[idx].ssl       = ssl;
-  sites[idx].domain    = domain;
-  sites[idx].loading   = false;
-  sites[idx].checkedAt = new Date().toISOString();
-  salvar();
-  renderTudo();
-}
-
-function adicionar() {
-  const input = document.getElementById('input-url');
-  const erro  = document.getElementById('erro-input');
-  const hostname = extrairHostname(input.value);
-
-  erro.style.display = 'none';
-  if (!hostname || !hostname.includes('.')) {
-    erro.textContent = 'Domínio inválido. Ex: empresa.com.br ou https://app.empresa.com';
-    erro.style.display = 'block';
-    return;
-  }
-  if (sites.some(s => s.hostname === hostname)) {
-    erro.textContent = 'Este site já está na lista.';
-    erro.style.display = 'block';
-    return;
-  }
-
-  const idx = sites.push({ hostname, loading: false }) - 1;
-  salvar();
-  input.value = '';
-  renderTudo();
-  verificarSite(idx);
-}
-
-function remover(idx) {
-  sites.splice(idx, 1);
-  salvar();
-  renderTudo();
-}
-
-function reverificar(idx) { verificarSite(idx); }
-
-async function reverificarTodos() {
-  const btn = document.getElementById('btn-rev');
+async function verificarTodos() {
+  const btn = document.getElementById("btn-rev");
   btn.disabled = true;
-  await Promise.all(sites.map((_, idx) => verificarSite(idx)));
+  await Promise.all(sites.map(verificarSite));
   btn.disabled = false;
+  document.getElementById("ultima-check").textContent =
+    "Atualizado às " + new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
 }
 
-// Inicia renderização com dados salvos
-renderTudo();
-// Reverifica todos na abertura (atualiza datas)
-if (sites.length > 0) reverificarTodos();
+function reverificarTodos() { verificarTodos(); }
+function setSyncInfo(m) { document.getElementById("sync-info").textContent = m; }
+
+// ── Render ───────────────────────────────────────────────
+function diasHtml(obj, loading) {
+  if (loading) return `<span class="d-loading"><span class="spinner-border spinner-border-sm me-1 align-middle"></span>verificando</span>`;
+  if (!obj||obj.error) return `<span class="d-error" title="${obj?.error||''}"><i class="fa-solid fa-circle-xmark me-1"></i>${obj?.error?"Erro":"–"}</span>`;
+  const d=obj.daysLeft, cls=d<=7?"d-critical":d<=30?"d-warning":"d-ok", icon=d<=7?"fa-triangle-exclamation":d<=30?"fa-clock":"fa-circle-check";
+  const dt = new Date(obj.expiry).toLocaleDateString("pt-BR");
+  return `<span class="${cls}" title="Vence em ${dt}"><i class="fa-solid ${icon} me-1"></i>${d} dia${d!==1?"s":""}</span>`;
+}
+
+function badgeHtml(st) {
+  if (st==="loading") return `<span class="badge badge-loading px-2"><span class="spinner-border spinner-border-sm me-1 align-middle"></span></span>`;
+  const m={ok:["badge-ok","fa-circle-check","OK"],warning:["badge-warning","fa-clock","Atenção"],critical:["badge-critical","fa-triangle-exclamation","Crítico"],error:["badge-error","fa-circle-xmark","Erro"]};
+  const [cls,ic,lb]=m[st]||m.error;
+  return `<span class="badge ${cls} px-2 py-1"><i class="fa-solid ${ic} me-1"></i>${lb}</span>`;
+}
+
+function trInnerHTML(h) {
+  const r=results[h]||{}, load=!!r.loading, st=load?"loading":calcStatus(r);
+  const dt=r.checkedAt?new Date(r.checkedAt).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):"–";
+  const dis=load?"disabled":"";
+  return `
+    <td><div class="domain-name"><i class="fa-solid fa-globe me-2 text-muted"></i>${h}</div>
+        <div class="domain-sub"><a href="https://${h}" target="_blank" class="text-decoration-none text-muted">https://${h} <i class="fa-solid fa-arrow-up-right-from-square fa-xs"></i></a></div></td>
+    <td class="text-center">${diasHtml(r.ssl,load)}</td>
+    <td class="text-center">${diasHtml(r.domain,load)}</td>
+    <td class="text-center">${badgeHtml(st)}</td>
+    <td class="text-center" style="font-size:.78rem;color:#999">${dt}</td>
+    <td class="text-center">
+      <button class="btn btn-sm btn-outline-secondary me-1" title="Reverificar" onclick="verificarSite('${h}')" ${dis}><i class="fa-solid fa-arrows-rotate"></i></button>
+      <button class="btn btn-sm btn-outline-danger" title="Remover" onclick="abrirRemover('${h}')" ${dis}><i class="fa-solid fa-trash-can"></i></button>
+    </td>`;
+}
+
+function renderLinha(h) {
+  let tr = document.getElementById("tr-" + h);
+  if (!tr) { renderTabela(); return; }
+  tr.innerHTML = trInnerHTML(h);
+}
+
+function renderTabela() {
+  const tbody=document.getElementById("tbody"), vazio=document.getElementById("vazio"),
+        wrap=document.getElementById("wrap-tabela"), leg=document.getElementById("legenda");
+  if (!sites.length) { vazio.style.display="block"; wrap.style.display="none"; leg.style.display="none"; atualizarCards(); return; }
+  vazio.style.display="none"; wrap.style.display="block"; leg.style.display="block";
+  tbody.innerHTML="";
+  sites.forEach(h => { const tr=document.createElement("tr"); tr.id="tr-"+h; tr.innerHTML=trInnerHTML(h); tbody.appendChild(tr); });
+  atualizarCards();
+}
+
+function atualizarCards() {
+  let ok=0,warn=0,crit=0;
+  sites.forEach(h=>{ const s=calcStatus(results[h]); if(s==="ok")ok++; else if(s==="warning")warn++; else if(s==="critical")crit++; });
+  document.getElementById("s-total").textContent=sites.length||"0";
+  document.getElementById("s-ok").textContent=ok;
+  document.getElementById("s-warn").textContent=warn;
+  document.getElementById("s-crit").textContent=crit;
+}
+
+// ── Adicionar / Remover ──────────────────────────────────
+async function adicionarSite() {
+  if (!getToken()) { abrirToken(); return; }
+  const input=document.getElementById("input-url"), erroEl=document.getElementById("erro-input");
+  const h=extrairHostname(input.value);
+  erroEl.style.display="none";
+  if (!h||!h.includes(".")) { erroEl.textContent="Domínio inválido."; erroEl.style.display="block"; return; }
+  if (sites.includes(h))    { erroEl.textContent="Este site já está na lista."; erroEl.style.display="block"; return; }
+  input.disabled=true;
+  try {
+    await gravarSites([...sites,h], `feat: adiciona ${h}`);
+    sites.push(h); results[h]={};
+    input.value="";
+    renderTabela();
+    await verificarSite(h);
+  } catch(e) { erroEl.textContent=e.message; erroEl.style.display="block"; }
+  finally { input.disabled=false; }
+}
+
+function abrirRemover(h) {
+  siteParaRemover=h;
+  document.getElementById("nome-remover").textContent=h;
+  new bootstrap.Modal(document.getElementById("modalRemover")).show();
+}
+
+async function confirmarRemocao() {
+  if (!siteParaRemover) return;
+  const h=siteParaRemover; siteParaRemover=null;
+  bootstrap.Modal.getInstance(document.getElementById("modalRemover")).hide();
+  try {
+    await gravarSites(sites.filter(s=>s!==h), `chore: remove ${h}`);
+    sites=sites.filter(s=>s!==h); delete results[h];
+    localStorage.setItem(CACHE_KEY,JSON.stringify(results));
+    renderTabela();
+  } catch(e) { alert("Erro ao remover: "+e.message); }
+}
+
+// ── Init ─────────────────────────────────────────────────
+atualizarBadgeToken();
+renderTabela();
+if (getToken()) {
+  carregarSites();
+} else {
+  setTimeout(abrirToken, 600);
+}
 </script>
 </body>
 </html>
