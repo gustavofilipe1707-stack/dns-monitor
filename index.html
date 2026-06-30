@@ -300,24 +300,30 @@ function rdapUrl(h) {
   return (m[tld] || "https://rdap.org/domain/") + r;
 }
 
+async function fetchCrtSh(query) {
+  try {
+    const r = await fetch(`https://crt.sh/?q=${encodeURIComponent(query)}&output=json`);
+    if (!r.ok) return [];
+    return await r.json();
+  } catch { return []; }
+}
+
 async function checkSSL(h) {
   try {
-    const r = await fetch(`https://crt.sh/?q=${encodeURIComponent(h)}&output=json`);
-    if (!r.ok) throw new Error("crt.sh indisponível");
-    const certs = await r.json();
+    // Busca com domínio exato E padrão wildcard (%.dominio) para pegar certs *.dominio
+    const [exato, wild] = await Promise.all([
+      fetchCrtSh(h),
+      fetchCrtSh('%.' + h)
+    ]);
+    const todos = [...exato, ...wild];
     const now = Date.now();
-    const ativos = certs
-      .filter(c => {
-        if (new Date(c.not_after + "Z").getTime() <= now) return false;
-        const ns = (c.name_value||"").split("\n").map(n=>n.trim().toLowerCase());
-        const wc = "*." + h.split(".").slice(1).join(".");
-        return ns.some(n => n===h || n===wc);
-      })
-      .sort((a,b) => new Date(b.not_after) - new Date(a.not_after));
-    const cert = ativos[0] || certs.filter(c=>new Date(c.not_after+"Z").getTime()>now).sort((a,b)=>new Date(b.not_after)-new Date(a.not_after))[0];
-    if (!cert) return { error: "Nenhum certificado ativo" };
-    const exp = new Date(cert.not_after + "Z");
-    return { expiry: exp.toISOString(), daysLeft: Math.ceil((exp-now)/86400000), issuer: cert.issuer_name };
+    const ativos = todos
+      .filter(c => new Date(c.not_after + "Z").getTime() > now)
+      .filter((c, i, arr) => arr.findIndex(x => x.id === c.id) === i) // dedupe
+      .sort((a, b) => new Date(b.not_after) - new Date(a.not_after));
+    if (!ativos.length) return { error: "Nenhum certificado ativo encontrado" };
+    const exp = new Date(ativos[0].not_after + "Z");
+    return { expiry: exp.toISOString(), daysLeft: Math.ceil((exp - now) / 86400000), issuer: ativos[0].issuer_name };
   } catch(e) { return { error: e.message }; }
 }
 
@@ -365,7 +371,13 @@ function setSyncInfo(m) { document.getElementById("sync-info").textContent = m; 
 // ── Render ───────────────────────────────────────────────
 function diasHtml(obj, loading) {
   if (loading) return `<span class="d-loading"><span class="spinner-border spinner-border-sm me-1 align-middle"></span>verificando</span>`;
-  if (!obj||obj.error) return `<span class="d-error" title="${obj?.error||''}"><i class="fa-solid fa-circle-xmark me-1"></i>${obj?.error?"Erro":"–"}</span>`;
+  if (!obj) return `<span class="d-error">–</span>`;
+  if (obj.error) {
+    // RDAP indisponível para alguns TLDs (ex: .vc) — não é erro do sistema
+    const naodisponivel = obj.error.includes("404") || obj.error.includes("RDAP") || obj.error.includes("Expiração") || obj.error.includes("timeout") || obj.error.includes("Timeout") || obj.error.includes("network") || obj.error.includes("Failed");
+    if (naodisponivel) return `<span class="d-error" title="${obj.error}"><i class="fa-solid fa-ban me-1"></i>N/D</span>`;
+    return `<span class="d-error" title="${obj.error}"><i class="fa-solid fa-circle-xmark me-1"></i>Erro</span>`;
+  }
   const d=obj.daysLeft, cls=d<=7?"d-critical":d<=30?"d-warning":"d-ok", icon=d<=7?"fa-triangle-exclamation":d<=30?"fa-clock":"fa-circle-check";
   const dt = new Date(obj.expiry).toLocaleDateString("pt-BR");
   return `<span class="${cls}" title="Vence em ${dt}"><i class="fa-solid ${icon} me-1"></i>${d} dia${d!==1?"s":""}</span>`;
